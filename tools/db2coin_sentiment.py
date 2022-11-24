@@ -74,7 +74,7 @@ def iter_scraperresults_by_date(db):
         yield res, str(current_date)
 
 
-df = pd.DataFrame(columns=['id','date','preprocess_txt','pos_count','neg_count','sentiment_m2', 'sentiment_model', 'sentiment_vader'])
+df = pd.DataFrame(columns=['id','date','preprocess_txt','pos_count','neg_count','sentiment_m2', 'sentiment_model', 'sentiment_vader_txt','sentiment_vader_pp'])
 db = ToolDBInterface()
 for srx, datestr in iter_scraperresults_by_date(db):
     for sr in srx:
