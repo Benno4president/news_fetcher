@@ -1,23 +1,23 @@
 from typing import List
 import pandas as pd
-from .db import Session, engine
+from .db import Session, get_engine
 from sqlmodel import select
 from .models import ScraperResult
 
 class SentimentDBInterface:
+    def __init__(self, path_to_db=None) -> None:
+        self.engine = get_engine(path_to_db)
 
-    @staticmethod
-    def insert_result_dataframe(df:pd.DataFrame):
-        with Session(engine) as sess:
+    def insert_result_dataframe(self, df:pd.DataFrame):
+        with Session(self.engine) as sess:
             for row_dict in df.to_dict(orient="records"):
                 res = ScraperResult(**row_dict)
                 sess.add(res)
             sess.commit()
 
 
-    @staticmethod
-    def get_last_hashes(platform:str, amount:int=50) -> List[str]:
-        with Session(engine) as sess:
+    def get_last_hashes(self, platform:str, amount:int=50) -> List[str]:
+        with Session(self.engine) as sess:
             statement = (
                 select(ScraperResult.hash)
                 .where(ScraperResult.origin == platform)
@@ -27,3 +27,5 @@ class SentimentDBInterface:
             res = sess.exec(statement).all()
             return res
 
+
+    
