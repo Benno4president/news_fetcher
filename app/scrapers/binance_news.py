@@ -27,7 +27,7 @@ class BinanceNews(IScraper):
     def get_title(self, soup: BeautifulSoup) -> str:
         return soup.find('h1', class_='css-ps28d1').get_text()
     
-    def get_author(self, soup:BeautifulSoup) -> str: # TODO this is bugged
+    def get_author(self, soup:BeautifulSoup) -> str:
         t = soup.find_all('div', class_='css-vurnku')[9].get_text()
         return t if ' -' not in t else t.split(' -')[0]
 

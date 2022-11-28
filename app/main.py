@@ -1,6 +1,5 @@
 import sys, os
 import pandas as pd
-from analysis import build_sentiment_pipeline, test_pipeline
 from scrapers import active_scrapers
 from datahandler import SentimentDBInterface, create_db
 from loguru import logger
@@ -16,8 +15,6 @@ def main():
     """
     """
     args = parse_args(sys.argv[1:])
-    nlp = build_sentiment_pipeline()
-    nlp_key = lambda x: nlp(x[:512])[0]['label']
     
     for scraper_name in active_scrapers:
         scraper = active_scrapers[scraper_name]()
@@ -27,9 +24,7 @@ def main():
         articles = scraper.run(ignore_ids=ids_from_db)
         articles['origin'] = scraper_name
         
-        # sentiment for the article
-        articles['sentiment'] = articles['text'].apply(nlp_key)
-        articles = articles[['hash', 'origin', 'title', 'author', 'published', 'sentiment', 'url', 'text']]
+        articles = articles[['hash', 'origin', 'title', 'author', 'published', 'url', 'text']]
 
         # update state file
         # **

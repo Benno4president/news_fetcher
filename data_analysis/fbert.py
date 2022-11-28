@@ -1,12 +1,12 @@
 from transformers import BertTokenizer, BertForSequenceClassification
 from transformers import pipeline
-from __init__ import MODEL_PATH, TOKENIZER_PATH
+from .paths import MODEL_PATH, TOKENIZER_PATH
 import os
 
 def build_sentiment_pipeline():
 
     if not (os.path.exists(MODEL_PATH) and os.path.exists(TOKENIZER_PATH)):
-        update_fbert()
+        __update_fbert()
 
     model = BertForSequenceClassification.from_pretrained(MODEL_PATH,num_labels=3)
     tokenizer = BertTokenizer.from_pretrained(TOKENIZER_PATH)
@@ -25,7 +25,7 @@ def test_pipeline(nlp):
     __import__('pprint').pprint(results)
 
 
-def update_fbert():
+def __update_fbert():
     """
     https://huggingface.co/ahmedrachid/FinancialBERT-Sentiment-Analysis
     """
@@ -37,7 +37,7 @@ def update_fbert():
 
 
 if __name__ == '__main__':
-    update_fbert()
+    __update_fbert()
     print("""
     FBERT saved.
     Download model using hugging face lib.
