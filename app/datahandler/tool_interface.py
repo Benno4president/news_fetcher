@@ -22,3 +22,8 @@ class ToolDBInterface:
             res = sess.exec(statement).all()
         return res
     
+    def get_all_text(self):
+        with Session(self.engine) as sess:
+            statement = select(ScraperResult.text)
+            res = sess.exec(statement).all()
+            return res
