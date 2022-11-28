@@ -13,8 +13,6 @@ import pandas as pd
 from loguru import logger
 #sudo apt install chromium-chromedriver
 
-#DIR = op.dirname(op.abspath(__file__))
-
 
 class IScraper(ABC):
     @abstractmethod
@@ -79,6 +77,7 @@ class IScraper(ABC):
 
 
     def execute_scrolling(self):
+        """ Not done, from old project """
         t0, t1 = 0, 110 # t1 = amount of scrolls
         lastHeight = self.driver.execute_script("return document.documentElement.scrollHeight")
         print('Start height:', lastHeight)
@@ -101,11 +100,19 @@ class IScraper(ABC):
 
     @abstractmethod
     def selenium_actions_on_webpage(self) -> None:
-        """ Use self.driver to interact with the selenium driver """
+        """
+        Use self.driver to interact with the active selenium driver
+        to remove banners, scroll etc.. 
+        whatevers needs to be done in the browser.
+        """
         raise NotImplementedError
     
     @abstractmethod
     def extract_article_urls(self, soup: BeautifulSoup) -> List[str]:
+        """ 
+        The soup param is the parsed html of the self.target_url.
+        This must return the list of urls containing the articles on the site.  
+        """
         raise NotImplementedError
 
     @abstractmethod
@@ -118,14 +125,17 @@ class IScraper(ABC):
     
     @abstractmethod
     def get_author(self, soup:BeautifulSoup) -> str:
+        """ return the author of the article."""
         raise NotImplementedError
 
     @abstractmethod
     def get_date_published(self, soup:BeautifulSoup) -> str:
+        """ return the publish date of the article as a string in the format 'yyyy-mm-dd hh:mm'. """
         raise NotImplementedError
     
     @abstractmethod
     def get_text(self, soup:BeautifulSoup) -> str:
+        """ return the text of the article as a single string. """
         raise NotImplementedError
 
 
