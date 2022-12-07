@@ -17,6 +17,7 @@ def parse_args():
     parser.add_argument('-s', '--scraper', choices=['all']+list(active_scrapers.keys()), 
                         default='all', help='Specify a single scraper to run')
     parser.add_argument('--init', action='store_true', help="Populate the database, then run.")
+    parser.add_argument('-i','--interactive', action='store_true', help="Manually control selenium for an extended time.")
     return parser.parse_args()
     
 
@@ -27,7 +28,7 @@ def run_scrape(args):
             # get id hashes from db (scraper_name)
             ids_from_db = SentimentDBInterface().get_last_hashes(scraper_name, amount=999)
 
-            articles: pd.DataFrame = scraper.run(ignore_ids=ids_from_db)
+            articles: pd.DataFrame = scraper.run(ignore_ids=ids_from_db, display_head=args.interactive)
             articles['origin'] = scraper_name
 
             articles = articles[['hash', 'origin', 'title', 'author', 'published', 'url', 'text']]

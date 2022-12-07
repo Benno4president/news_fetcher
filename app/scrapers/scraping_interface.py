@@ -21,7 +21,8 @@ class IScraper(ABC):
         self.base_url = '' # https://www.binance.com
         self.target_url = '' # https://www.binance.com/en/news/top
     
-    def run(self, ignore_ids:List[str]=[]) -> pd.DataFrame:
+    def run(self, ignore_ids:List[str]=[], display_head=False) -> pd.DataFrame:
+        self.display_head = display_head
         columns=['hash','url','title','author','published','text']
         article_urls = self.__selenium_get_article_urls()
         new_article_urls = [a for a in article_urls if self.__sha256(a) not in ignore_ids]
@@ -58,6 +59,8 @@ class IScraper(ABC):
         self.driver.get(self.target_url)
         time.sleep(5)
         self.selenium_actions_on_webpage()
+        if self.display_head:
+            time.sleep(30)
         time.sleep(1) 
         html_doc = self.driver.page_source
         self.driver.close()
@@ -71,7 +74,8 @@ class IScraper(ABC):
         options = webdriver.ChromeOptions()
         options.add_argument('--ignore-certificate-errors')
         options.add_argument('--incognito')
-        options.add_argument('headless')                        
+        if not self.display_head:
+            options.add_argument('headless')                        
         driver = webdriver.Chrome(options=options)
         return (driver)
 

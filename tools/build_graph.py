@@ -107,21 +107,23 @@ def text_2_network_graph(text_df:pd.DataFrame, id_key:str, text_key:str, word_df
 
 if __name__ == '__main__':
     # Input file
-    input_file = "mush_test.csv"
+    input_file = "tools/db2coin_out.csv"
 
     # Output files
-    output_file_words = "words.csv"
+    #output_file_words = "tools/words.csv"
 
     doc_df = pd.read_csv(input_file, quotechar='"', encoding='utf8', doublequote=True, quoting=csv.QUOTE_NONNUMERIC, dtype=object, on_bad_lines='skip')
+    doc_df['temp_index'] = range(0,len(doc_df))
+    
     print("Preview of the document list:")
     print(doc_df)
 
-    words = doc_2_wordlist(doc_df, 'story')
+    words = doc_2_wordlist(doc_df, 'preprocess_txt')
     print(words)
 
-    graph = text_2_network_graph(text_df=doc_df, id_key='id', text_key='story', word_df=words, word_key='text')
+    graph = text_2_network_graph(text_df=doc_df, id_key='temp_index', text_key='preprocess_txt', word_df=words, word_key='text')
 
-    output_file_network = "terms-document-network.gexf"
+    output_file_network = "tools/terms-document-network.gexf"
     nx.write_gexf(graph, output_file_network)
 
 
