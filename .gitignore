@@ -3,8 +3,14 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# add new here
 model/
 *.gexf
+tools/*.csv
+
+
+
+
 # C extensions
 *.so
 
