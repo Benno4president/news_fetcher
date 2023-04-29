@@ -18,9 +18,9 @@ import datetime
 class IScraper(ABC):
     @abstractmethod
     def __init__(self) -> None:
-        self.name = ''
-        self.base_url = '' # https://www.binance.com
-        self.target_url = '' # https://www.binance.com/en/news/top
+        self.name:str = ''
+        self.base_url:str = '' # https://www.binance.com
+        self.target_url:str = '' # https://www.binance.com/en/news/top
     
     def run(self, ignore_ids:List[str]=[], display_head=False) -> pd.DataFrame:
         self.display_head = display_head
@@ -32,7 +32,8 @@ class IScraper(ABC):
         article_df = pd.DataFrame(columns=columns)
         for article in new_article_urls:
             logger.info('Getting: {}', article)
-            res = requests.get(article)
+            res = requests.get(article, headers={'User-Agent':'Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/112.0'})
+            logger.debug('Page content size: {}', len(res.content))
             soup = BeautifulSoup(res.content, 'html.parser')
             row_tuple = self.__scrape_articles(soup)
 
@@ -43,7 +44,7 @@ class IScraper(ABC):
         return article_df
 
     @staticmethod
-    def normalize_datetime(timestr:str, in_format:str) -> str:
+    def standardize_datetime(timestr:str, in_format:str) -> str:
         """
         Used to convert a datetime string to a consistent format.
         Docs: https://docs.python.org/2/library/datetime.html?highlight=strftime#strftime-and-strptime-behavior
@@ -56,9 +57,13 @@ class IScraper(ABC):
 
     def __scrape_articles(self, soup:BeautifulSoup) -> Tuple[str,str,str,str]:
         title = self.get_title(soup)
+        logger.debug('Title: {}', title)
         author = self.get_author(soup)
+        logger.debug('Author: {}', author)
         published = self.get_date_published(soup)
+        logger.debug('Pub: {}', published)
         text = self.get_text(soup)
+        logger.debug('Text len: {}', len(text))
         return tuple((title, author, published, text))
 
 

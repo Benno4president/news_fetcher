@@ -5,7 +5,6 @@ import pandas as pd
 from scrapers import active_scrapers
 from datahandler import SentimentDBInterface, create_db
 
-
 def parse_args():
     desc = """
             Hello there!, welcome to a low code news article fetcher.
@@ -57,6 +56,16 @@ def main():
     global active_scrapers # yes, i mutate a global, embrace chaos.
     args = parse_args()
     print(args)
+    
+    # Remove to reset logging level to something else
+    logger_format = (
+        "<green>{time:YYYY-MM-DD HH:mm:ss}</green> | "
+        "<level>{level: <8}</level> | "
+        "<level>{message}</level>"
+    )
+    logger.remove(0)
+    logger.add(sys.stderr, format=logger_format, level="INFO" if not args.test else "DEBUG")
+
     if args.init:
         create_db()
     if args.scraper != 'all':
