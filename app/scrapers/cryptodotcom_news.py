@@ -9,8 +9,9 @@ from bs4 import BeautifulSoup
 
 class CryptoDotCom(IScraper):
     def __init__(self) -> None:
-        self.name = 'CryptoDotCom'
-        self.target_url = 'https://crypto.com/market-updates'
+        self.name = 'CryptoDotCom'# must
+        self.target_url = 'https://crypto.com/market-updates' # must
+        self.base_url = 'https://crypto.com' # used in extract_article_urls
 
     def selenium_actions_on_webpage(self) -> None:
         # remove cookie banner
@@ -24,23 +25,15 @@ class CryptoDotCom(IScraper):
         return list(set(a))
 
     def get_title(self, soup: BeautifulSoup) -> str:
-        return soup.find('h1', class_='css-ps28d1').get_text()
+        return soup.find('h1', class_='article-title').get_text()
     
     def get_author(self, soup:BeautifulSoup) -> str:
-        t = soup.find_all('div', class_='css-vurnku')[9].get_text()
-        return t if ' -' not in t else t.split(' -')[0]
+        return 'Research and Insights Team' # no special devisions.
 
     def get_date_published(self, soup:BeautifulSoup) -> str:
-        return soup.find('div', class_='css-1hmgk20').get_text()
+        datestr = soup.find('span', class_='article-university-details-date').get_text()
+        return self.normalize_datetime(datestr, '%b %d, %Y')
 
     def get_text(self, soup: BeautifulSoup) -> str:
-        text = soup.find('article', class_='css-14bbu9p')
-        if text is None:
-            print('OTHER ARTICLE CSS CLASS FOUND')
-            text = soup.find('article', class_='css-17l2a77')
+        text = soup.find('div', class_='article-box-text')
         return text.get_text()
-
-if __name__ == '__main__':
-    a = BinanceNews()
-    news = a.run()
-    print(news)

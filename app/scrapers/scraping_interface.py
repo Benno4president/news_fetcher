@@ -11,6 +11,7 @@ from selenium.webdriver.common.keys import Keys
 from bs4 import BeautifulSoup
 import pandas as pd
 from loguru import logger
+import datetime
 #sudo apt install chromium-chromedriver
 
 
@@ -42,6 +43,14 @@ class IScraper(ABC):
         return article_df
 
     @staticmethod
+    def normalize_datetime(timestr:str, in_format:str) -> str:
+        """
+        Used to convert a datetime string to a consistent format.
+        Docs: https://docs.python.org/2/library/datetime.html?highlight=strftime#strftime-and-strptime-behavior
+        """
+        return str(datetime.datetime.strptime(timestr, in_format).strftime('%Y-%m-%d %H:%M'))
+    
+    @staticmethod
     def __sha256(text):
         return hashlib.sha256(text.encode('utf-8')).hexdigest()
 
@@ -60,7 +69,7 @@ class IScraper(ABC):
         time.sleep(5)
         self.selenium_actions_on_webpage()
         if self.display_head:
-            time.sleep(30)
+            time.sleep(45)
         time.sleep(1) 
         html_doc = self.driver.page_source
         self.driver.close()
@@ -115,21 +124,18 @@ class IScraper(ABC):
     def extract_article_urls(self, soup: BeautifulSoup) -> List[str]:
         """ 
         The soup param is the parsed html of the self.target_url.
-        This must return the list of urls containing the articles on the site.  
+        This must return the list of urls containing the articles on the site.
         """
         raise NotImplementedError
 
     @abstractmethod
     def get_title(self, soup:BeautifulSoup) -> str:
-        """ 
-        input: soup containing entire article.
-        return: title of the article, not the webpage.
-        """
+        """ return the title of the article, not the webpage, as a string. """
         raise NotImplementedError
     
     @abstractmethod
     def get_author(self, soup:BeautifulSoup) -> str:
-        """ return the author of the article."""
+        """ return the author of the article as a string."""
         raise NotImplementedError
 
     @abstractmethod

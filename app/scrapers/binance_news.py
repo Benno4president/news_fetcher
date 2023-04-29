@@ -40,8 +40,3 @@ class BinanceNews(IScraper):
             print('OTHER ARTICLE CSS CLASS FOUND')
             text = soup.find('article', class_='css-17l2a77')
         return text.get_text()
-
-if __name__ == '__main__':
-    a = BinanceNews()
-    news = a.run()
-    print(news)

@@ -22,11 +22,12 @@ def parse_args():
     
 
 def run_scrape(args):
+    db = SentimentDBInterface()
     for scraper_name in active_scrapers:
         try:
             scraper = active_scrapers[scraper_name]()
             # get id hashes from db (scraper_name)
-            ids_from_db = SentimentDBInterface().get_last_hashes(scraper_name, amount=999)
+            ids_from_db = db.get_last_hashes(scraper_name, amount=999)
 
             articles: pd.DataFrame = scraper.run(ignore_ids=ids_from_db, display_head=args.interactive)
             articles['origin'] = scraper_name
@@ -42,17 +43,18 @@ def run_scrape(args):
                 print(articles.columns)
                 print('-'*45)
                 print(articles)
+                articles.to_csv(f'./newsfetcher_debug_{scraper_name}.csv')
             else:
                 logger.info('finished scraping {} | new entries: {} | inserting into db...', scraper_name, len(articles))
-                SentimentDBInterface().insert_result_dataframe(articles)
+                db.insert_result_dataframe(articles)
         except Exception as e:
             logger.error('{} thrown on {}', e, scraper_name)
 
 
 def main():
-    global active_scrapers # yes, i mutate a global, fuck you.
     """
     """
+    global active_scrapers # yes, i mutate a global, embrace chaos.
     args = parse_args()
     print(args)
     if args.init:
