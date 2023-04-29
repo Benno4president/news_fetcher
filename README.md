@@ -4,9 +4,32 @@ This repo contains:
 - A data analysis 'lib' containing a set of text sentiment methods.
 - A set of tools to pull and transform stored data.
 
+## Installation
+```bash
+# get repository.
+git clone git@github.com:Benno4president/news_fetcher.git
+# create a virtual environment (optional).
+python3 -m venv venv
+# install the required libs.
+pip3 install -r requirements.txt
+# install the driver needed by selenium.
+sudo apt install chromium-chromedriver
+```
+### Database
+```bash
+# if there is no database.db file,
+# this is needed to initialize a new one.
+python3 app/main.py --init
+```
+
 ## Usage
 ```bash
-python3 app/main.py --help
+# scraper usage.
+python3 app/main.py --help 
+# create a csv of sentiment values.
+python3 tools/db2coin_sentiment.py 
+# to build a .gexf file.
+python3 tools/build_graph.py 
 ```
 ## Add scraper interface
 First, create a new Scraper Interface python file in the scrapers directory:
@@ -22,7 +45,7 @@ class BinanceNews(IScraper):
         self.base_url = 'https://www.binance.com'
 
 ```
-Appart from init, IScraper contains 6 abstract methods to overwrite.
+Apart from init, IScraper contains 6 abstract methods to overwrite.
 ```py
     def selenium_actions_on_webpage(self) -> None:
         """
@@ -34,17 +57,14 @@ Appart from init, IScraper contains 6 abstract methods to overwrite.
     def extract_article_urls(self, soup: BeautifulSoup) -> List[str]:
         """ 
         The soup param is the parsed html of the self.target_url.
-        This must return the list of urls containing the articles on the site.  
+        This must return the list of urls containing the articles on the site.
         """
 
     def get_title(self, soup:BeautifulSoup) -> str:
-        """ 
-        input: soup containing entire article.
-        return: title of the article, not the webpage.
-        """
+        """ return the title of the article, not the webpage, as a string. """
     
     def get_author(self, soup:BeautifulSoup) -> str:
-        """ return the author of the article."""
+        """ return the author of the article as a string."""
 
     def get_date_published(self, soup:BeautifulSoup) -> str:
         """ return the publish date of the article as a string in the format 'yyyy-mm-dd hh:mm'. """
