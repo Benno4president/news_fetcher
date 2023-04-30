@@ -26,7 +26,7 @@ def run_scrape(args):
         try:
             scraper = active_scrapers[scraper_name]()
             # get id hashes from db (scraper_name)
-            ids_from_db = db.get_last_hashes(scraper_name, amount=999)
+            ids_from_db = db.get_last_hashes(scraper_name, amount=9999)
 
             articles: pd.DataFrame = scraper.run(ignore_ids=ids_from_db, display_head=args.interactive)
             articles['origin'] = scraper_name

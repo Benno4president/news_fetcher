@@ -3,6 +3,7 @@ import pandas as pd
 from .db import Session, get_engine
 from sqlmodel import select
 from .models import ScraperResult
+from loguru import logger
 
 class SentimentDBInterface:
     def __init__(self, path_to_db=None) -> None:
@@ -11,8 +12,11 @@ class SentimentDBInterface:
     def insert_result_dataframe(self, df:pd.DataFrame):
         with Session(self.engine) as sess:
             for row_dict in df.to_dict(orient="records"):
-                res = ScraperResult(**row_dict)
-                sess.add(res)
+                try:
+                    res = ScraperResult(**row_dict)
+                    sess.add(res)
+                except:
+                    logger.error(f'DB reuslt entry denied. Maybe dublicate. hash: {res.hash}')
             sess.commit()
 
 

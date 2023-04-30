@@ -1,5 +1,6 @@
 from .scraping_interface import IScraper
 import time
+import datetime
 from typing import List
 from urllib.parse import urljoin
 from selenium.webdriver.common.by import By
@@ -32,6 +33,8 @@ class CoinTelegraph(IScraper):
 
     def get_date_published(self, soup:BeautifulSoup) -> str:
         datestr = soup.find('div', class_='post-meta__publish-date').get_text()
+        if 'ago' in datestr:
+            return self.standardize_datetime(str(datetime.datetime.now().date()), '%Y-%m-%d')
         return self.standardize_datetime(datestr, ' %b %d, %Y ') # fx APR 24, 2023
 
     def get_text(self, soup: BeautifulSoup) -> str:
