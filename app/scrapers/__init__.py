@@ -1,3 +1,5 @@
+from .scraping_interface import IScraper
+
 from .binance_news import BinanceNews
 from .cryptodotcom_news import CryptoDotCom
 from .cointelegraph_news import CoinTelegraph
