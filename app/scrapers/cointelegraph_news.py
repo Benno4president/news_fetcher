@@ -20,7 +20,7 @@ class CoinTelegraph(IScraper):
         time.sleep(1)
 
     def extract_article_urls(self, soup: BeautifulSoup) -> List[str]:
-        news_blocks = soup.find_all('li', class_='posts-listing__item', recursive=True)
+        news_blocks = soup.find_all('li', class_='group-[.inline]:mb-8', recursive=True)
         hrefs = [b.find('a', recursive=True)['href'] for b in news_blocks]
         a = map(lambda x: urljoin(self.base_url, x), hrefs)
         return list(set(a))

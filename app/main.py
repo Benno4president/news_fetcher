@@ -42,7 +42,7 @@ def run_scrape(args):
                 print(articles.columns)
                 print('-'*45)
                 print(articles)
-                articles.to_csv(f'./newsfetcher_debug_{scraper_name}.csv')
+                articles.to_csv(f'./newsfetcher_debug_{scraper_name}.csv', escapechar='\\')
             else:
                 logger.info('finished scraping {} | new entries: {} | inserting into db...', scraper_name, len(articles))
                 db.insert_result_dataframe(articles)

@@ -107,12 +107,12 @@ def text_2_network_graph(text_df:pd.DataFrame, id_key:str, text_key:str, word_df
 
 if __name__ == '__main__':
     # Input file
-    input_file = "tools/db2coin_out.csv"
+    input_file = "db_dump_len2629_sentiment_reordered.csv"
 
     # Output files
     #output_file_words = "tools/words.csv"
 
-    doc_df = pd.read_csv(input_file, quotechar='"', encoding='utf8', doublequote=True, quoting=csv.QUOTE_NONNUMERIC, dtype=object, on_bad_lines='skip')
+    doc_df = pd.read_csv(input_file, quotechar='"', encoding='ISO-8859-1', doublequote=True, quoting=csv.QUOTE_NONNUMERIC, dtype=object, on_bad_lines='skip', escapechar='\\')
     doc_df['temp_index'] = range(0,len(doc_df))
     
     print("Preview of the document list:")

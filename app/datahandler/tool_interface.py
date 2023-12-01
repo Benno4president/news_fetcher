@@ -22,6 +22,12 @@ class ToolDBInterface:
             res = sess.exec(statement).all()
         return res
     
+    def get_all_sorted_by_date(self):
+        with Session(self.engine) as sess:
+            statement = select(ScraperResult).order_by(ScraperResult.published)
+            res = sess.exec(statement).all()
+        return res
+    
     def get_all_text(self):
         with Session(self.engine) as sess:
             statement = select(ScraperResult.text)
