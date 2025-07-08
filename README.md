@@ -4,10 +4,19 @@ This repo contains:
 - A data analysis 'lib' containing a set of text sentiment methods.
 - A set of tools to pull and transform stored data.
 
+## Description
+News Monitor is a Python-based toolkit for scraping news sources, performing sentiment analysis, and exporting or transforming stored data. It collects news articles from your chosen sources in real time using Selenium, BeautifulSoup, and Pandas. All articles are stored in a SQL database via SQLModel.
+
+Extending the scraper to cover additional sources is straightforward: just create a scraper class that inherits from the IScraper abstract class, following the interface pattern built into the system.
+
+The main tool in the tools folder is db2coin_sentiment.py. This script brings together multiple modules to run a variety of sentiment analysis algorithms on all stored articles. The methods include VADER and m2 from NLTK, as well as FBERT from HuggingFace.
+
 ## Installation
 ```bash
 # get repository.
 git clone git@github.com:Benno4president/news_fetcher.git
+# enter dir
+cd news_fetcher 
 # create a virtual environment (optional).
 python3 -m venv venv
 # install the required libs.

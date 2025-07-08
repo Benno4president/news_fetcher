@@ -7,7 +7,7 @@ __pycache__/
 model/
 *.gexf
 tools/*.csv
-
+.vscode
 
 
 
