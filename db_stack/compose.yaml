@@ -1,0 +1,48 @@
+services:
+  timescaledb:
+    image: timescale/timescaledb:latest-pg12
+    restart: always
+    environment:
+      - POSTGRES_USER=benno
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=news_database
+    ports:
+      - "5432:5432"
+    volumes:
+      - timescale_data:/var/lib/postgresql/data
+    network_mode: host
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=juel.work@gmail.com 
+      - PGADMIN_DEFAULT_PASSWORD=admin  
+    ports:
+      - "80:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    network_mode: host
+
+  telegraf:
+    image: telegraf:latest
+    restart: always
+    volumes:
+      - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    depends_on:
+      - timescaledb
+
+  grafana:
+    image: grafana/grafana:latest
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    network_mode: host
+
+volumes:
+  pgadmin_data:
+  timescale_data:
+
+
