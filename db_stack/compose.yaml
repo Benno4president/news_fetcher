@@ -15,6 +15,7 @@ services:
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin
+    restart: always
     environment:
       - PGADMIN_DEFAULT_EMAIL=juel.work@gmail.com 
       - PGADMIN_DEFAULT_PASSWORD=admin  
@@ -31,6 +32,7 @@ services:
       - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
     depends_on:
       - timescaledb
+    network_mode: host
 
   grafana:
     image: grafana/grafana:latest
@@ -39,10 +41,14 @@ services:
       - "3000:3000"
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SERVER_ROOT_URL=http://my.grafana.server/
+      - GF_PLUGINS_PREINSTALL=grafana-clock-panel
+    volumes:
+      - grafana-storage:/var/lib/grafana
     network_mode: host
 
 volumes:
   pgadmin_data:
   timescale_data:
-
+  grafana-storage:
 
