@@ -3,6 +3,8 @@ Setup telegraph to use a timescaledb: https://docs.tigerdata.com/integrations/la
 - ```docker run --rm telegraf telegraf --input-filter cpu:mem:disk:net  --output-filter=postgresql config > telegraf.conf```
 
 postgress could not bind to port, already in use. => https://superuser.com/questions/756933/postgresql-does-not-start-in-ubuntu-says-could-not-bind-ipv4-socket
+- ```pg_lsclusters```
+- ```sudo pg_ctlcluster 14 main stop```
 
 make graphana dash for telegraf metrics: https://docs.tigerdata.com/integrations/latest/grafana/
 - goal: full system dashboard: https://grafana.com/grafana/dashboards/928-telegraf-system-dashboard/
