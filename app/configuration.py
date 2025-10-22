@@ -1,5 +1,5 @@
 import os
-from .scrapers import active_scrapers
+from scrapers import active_scrapers
 
 class Configuration:
     db_path:str = os.getenv("DATABASE")

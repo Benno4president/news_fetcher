@@ -1,10 +1,11 @@
 import sys
-import os
 import argparse
 from loguru import logger
 import pandas as pd
 from scrapers import active_scrapers, IScraper
-from datahandler import SentimentDBInterface, create_db
+#from datahandler import SentimentDBInterface, create_db
+from db import DatabaseInterface
+from configuration import Configuration
 
 def parse_args():
     desc = """
@@ -22,7 +23,7 @@ def parse_args():
     
 
 def run_scrape(args):
-    db = SentimentDBInterface()
+    db = DatabaseInterface()
     for scraper_name in active_scrapers:
         #try:
             scraper:IScraper = active_scrapers[scraper_name]()
@@ -67,9 +68,9 @@ def main():
     logger.remove(0)
     logger.add(sys.stderr, format=logger_format, level="INFO" if not args.test else "DEBUG")
 
-    if args.init:
-        create_db()
-    if args.scraper != 'all':
+    #if args.init:
+        #create_db()
+    if Configuration.partitioned_scrapers != 'all': #args.scraper != 'all':
         active_scrapers = {args.scraper:active_scrapers.pop(args.scraper)}
     
     #:repeat
