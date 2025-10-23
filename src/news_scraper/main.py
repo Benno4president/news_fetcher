@@ -1,0 +1,90 @@
+import sys
+import time
+import argparse
+from loguru import logger
+import pandas as pd
+from scrapers import active_scrapers, IScraper
+from db import DatabaseInterface
+from configuration import Configuration
+
+def parse_args():
+    desc = """
+            Hello there!, welcome to a low code news article fetcher.
+            Start scraping any news source using only very litte and 
+            very googlable python code.
+        """
+    parser = argparse.ArgumentParser(prog='News Fetcher',description=desc, usage='just press play')
+    parser.add_argument('-t', '--test', action='store_true', help="Won't save to db, but prints instead")
+    parser.add_argument('-s', '--scraper', choices=['env','all']+list(active_scrapers.keys()), 
+                        default='env', help='Specify a single scraper to run. Overwrites env variable.')
+    parser.add_argument('-i','--interactive', nargs='?', type=int, const=15, default=0, help="Manually control selenium for an extended time.")
+    return parser.parse_args()
+    
+
+def run_scrape(args):
+    db = DatabaseInterface()
+    for scraper_name in active_scrapers:
+        #try:
+            scraper:IScraper = active_scrapers[scraper_name]()
+            # get id hashes from db (scraper_name)
+            ids_from_db = db.get_last_hashes(scraper_name, amount=9999)
+
+            articles: pd.DataFrame = scraper.run(ignore_ids=ids_from_db, display_head_t=args.interactive)
+            articles['origin'] = scraper_name
+
+            articles = articles[['hash', 'origin', 'title', 'author', 'published', 'url', 'text']]
+
+            # update state file
+            # **
+
+            # save to db
+            if args.test:
+                print('Labels:')
+                print(articles.columns)
+                print('-'*45)
+                print(articles)
+                articles.to_csv(f'./newsfetcher_debug_{scraper_name}.csv', escapechar='\\')
+            else:
+                logger.info('finished scraping {} | new entries: {} | inserting into db...', scraper_name, len(articles))
+                db.insert_result_dataframe(articles)
+        #except Exception as e:
+        #    logger.error('{} thrown on {}', e, scraper_name)
+
+
+def main():
+    """
+    """
+    global active_scrapers # yes, i mutate a global, embrace chaos.
+    args = parse_args()
+    print(args)
+    
+    # Remove to reset logging level to something else
+    logger_format = (
+        "<green>{time:YYYY-MM-DD HH:mm:ss}</green> | "
+        "<level>{level: <8}</level> | "
+        "<level>{message}</level>"
+    )
+    logger.remove(0)
+    logger.add(sys.stderr, format=logger_format, level="INFO" if not args.test else "DEBUG")
+
+    # not so clean..
+    if args.scraper == 'env':
+        if 'all' in Configuration.partitioned_scrapers:
+            pass # do nothing
+        else:
+            active_scrapers = {k: active_scrapers[k] for k in Configuration.partitioned_scrapers}
+    elif args.scraper != 'all':
+        active_scrapers = {args.scraper: active_scrapers[args.scraper]}
+    
+    interval = 60 * int(Configuration.interval_time_minutes)
+    
+    while True:
+        run_scrape(args)
+        if interval == 0:
+            break
+        logger.info('Running again in {} minutes', inteval/60)
+        time.sleep(interval)
+    
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,7 @@
+bs4==0.0.1
+loguru==0.7.0
+pandas==2.2.3
+selenium==4.9.0
+SQLalchemy==2.0.44
+requests==2.32.5
+psycopg2-binary==2.9.11

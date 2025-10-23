@@ -1,0 +1,11 @@
+services:
+  news-scraper:
+    build: 
+      context: ./src
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: "postgresql://benno:password@127.0.0.1:5432/news_database"
+      SCRAPERS: '["binance_news"]'
+      INTERVAL_TIME_MINUTE: 3
+    restart: unless-stopped
+    network_mode: host
