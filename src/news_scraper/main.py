@@ -4,7 +4,7 @@ import argparse
 from loguru import logger
 import pandas as pd
 from scrapers import active_scrapers, IScraper
-from db import DatabaseInterface
+from db import DatabaseInterface, TestDatabaseInterface
 from configuration import Configuration
 
 def parse_args():
@@ -22,7 +22,7 @@ def parse_args():
     
 
 def run_scrape(args):
-    db = DatabaseInterface()
+    db = TestDatabaseInterface()
     for scraper_name in active_scrapers:
         #try:
             scraper:IScraper = active_scrapers[scraper_name]()

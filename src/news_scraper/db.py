@@ -36,8 +36,12 @@ class DatabaseInterface:
         return res
 
 
-    
+class TestDatabaseInterface:
+    def insert_result_dataframe(self, df):
+        return
 
+    def get_last_hashes(self, platform, amount):
+        return []
 
 
 
