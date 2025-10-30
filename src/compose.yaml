@@ -1,0 +1,20 @@
+services:
+  news_collector:
+    build: .
+    restart: always
+    environment:
+      DATABASE_URL: postgresql://benno:password@127.0.0.1:5432/news_database
+      SCRAPERS: '["binance_news", "crypto_news", "coin_telegraph"]'
+      INTERVAL_TIME_MINUTE: 360
+    network_mode: host
+    depends_on:
+      - selenium-chrome
+
+  selenium-chrome:
+    image: selenium/standalone-chrome:4.38.0-20251025
+    container_name: selenium-standalone-chrome
+    ports:
+      - "4444:4444"
+    shm_size: 2g
+    restart: unless-stopped
+    network_mode: host

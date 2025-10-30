@@ -1,9 +1,11 @@
-from sqlalchemy import create_engine, exc
+from typing import List
 from loguru import logger
 import pandas as pd
-from configuration import Configuration 
-from typing import List
+from sqlalchemy import create_engine, text, Table, MetaData
+from sqlalchemy.engine import Engine
+from sqlalchemy.orm import Session
 
+from configuration import Configuration 
 
 def get_engine(echo=False):
     p = Configuration.db_path
@@ -15,26 +17,43 @@ def get_engine(echo=False):
 class DatabaseInterface:
     def __init__(self) -> None:
         self.engine = get_engine()
+        self._metadata = MetaData()
+        self.articles_table = Table("articles", self._metadata, autoload_with=self.engine)
 
     def insert_result_dataframe(self, df:pd.DataFrame):
-        # TODO simplest but most error prone solution. if any extension is needed, a rewrite is due.
-        conn = self.engine.raw_connection()
-        df.to_sql("sentiment_articles", con=conn, if_exists="fail", index=False, method="multi")
+        if df.empty:
+            return
+
+        table_cols = [c.name for c in self.articles_table.columns]
+        df = df.loc[:, df.columns.intersection(table_cols)]
+        df = df[[c for c in table_cols if c in df.columns]]
+        records = df.to_dict(orient="records")
+        if not records:
+            return
+
+        with Session(self.engine) as session:
+            try:
+                session.execute(self.articles_table.insert(), records)
+                session.commit()
+            except Exception:
+                session.rollback()
+                raise
 
 
     def get_last_hashes(self, platform:str, amount:int=50) -> List[str]:
-        # TODO simplest but most error prone solution. if any extension is needed, a rewrite is due.
-        query = f'''
+        sql = text("""
             SELECT hash
-            FROM sentiment_articles
-            WHERE origin = {platform}
-            ORDER BY time DESC
-            LIMIT {amount};
-        '''
-        conn = self.engine.raw_connection()        
-        res = pd.read_sql(query, con=conn)
-        return res
+            FROM articles
+            WHERE origin = :platform
+            ORDER BY published DESC
+            LIMIT :limit
+        """)
+        params = {"platform": platform, "limit": int(amount)}
 
+        with self.engine.connect() as conn:
+            result = conn.execute(sql, params)
+            rows = [row["hash"] for row in result.fetchall()]
+        return rows
 
 class TestDatabaseInterface:
     def insert_result_dataframe(self, df):

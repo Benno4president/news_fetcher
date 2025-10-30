@@ -35,11 +35,11 @@ class IScraper(ABC):
         self.display_head_t = display_head_t
         self._selenium_driver = None # making sure it is registered as init is abstract.
 
-        columns=['hash','url','title','author','published','text']
         article_urls = self.__selenium_get_article_urls()
         new_article_urls = [a for a in article_urls if self.__sha256(a) not in ignore_ids]
         logger.info('{} | New articles found: {}', self.name, len(new_article_urls))
 
+        columns=['hash','url','title','author','published','text']
         article_df = pd.DataFrame(columns=columns)
         for article in new_article_urls:
             logger.info('Getting: {}', article)
@@ -100,6 +100,7 @@ class IScraper(ABC):
         driver = self.__get_selenium()
         driver.get(self.target_url)
         time.sleep(5)
+        logger.debug('Executing actions on webpage')
         self.selenium_actions_on_webpage()
         if bool(self.display_head_t):
             time.sleep(self.display_head_t)
@@ -117,9 +118,13 @@ class IScraper(ABC):
         options = webdriver.ChromeOptions()
         options.add_argument('--ignore-certificate-errors')
         options.add_argument('--incognito')
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
+        options.add_argument('--disable-gpu')
         if not bool(self.display_head_t):
-            options.add_argument('headless')                        
-        driver = webdriver.Chrome(options=options)
+            options.add_argument('headless')
+        #driver = webdriver.Chrome(options=options)
+        driver = webdriver.Remote('http://127.0.0.1:4444/wd/hub', options=options)
         self._selenium_driver = driver
         return (driver)
 

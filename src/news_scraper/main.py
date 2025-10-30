@@ -22,7 +22,7 @@ def parse_args():
     
 
 def run_scrape(args):
-    db = TestDatabaseInterface()
+    db = DatabaseInterface()
     for scraper_name in active_scrapers:
         #try:
             scraper:IScraper = active_scrapers[scraper_name]()
@@ -32,7 +32,7 @@ def run_scrape(args):
             articles: pd.DataFrame = scraper.run(ignore_ids=ids_from_db, display_head_t=args.interactive)
             articles['origin'] = scraper_name
 
-            articles = articles[['hash', 'origin', 'title', 'author', 'published', 'url', 'text']]
+            articles = articles[['hash', 'published', 'origin', 'author', 'title', 'url', 'text']]
 
             # update state file
             # **
@@ -82,7 +82,7 @@ def main():
         run_scrape(args)
         if interval == 0:
             break
-        logger.info('Running again in {} minutes', inteval/60)
+        logger.info('Running again in {} minutes', interval/60)
         time.sleep(interval)
     
 
