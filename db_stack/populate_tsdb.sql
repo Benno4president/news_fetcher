@@ -8,7 +8,7 @@ CREATE TABLE articles (
         url TEXT,
         text TEXT,
 
-        PRIMARY KEY (hash)
+        PRIMARY KEY (hash, published)
     );
 
 CREATE TYPE finbert_score_enum AS ENUM ('positive', 'neutral', 'negative');
@@ -16,7 +16,7 @@ CREATE TYPE finbert_score_enum AS ENUM ('positive', 'neutral', 'negative');
 CREATE TABLE sentiments (
         hash TEXT NOT NULL,
         published TIMESTAMPTZ NOT NULL,
-        origin TEXT,
+        origin TEXT NOT NULL,
 
         finbert_score finbert_score_enum,
         neg DOUBLE PRECISION,
@@ -27,9 +27,8 @@ CREATE TABLE sentiments (
         neg_count INTEGER,
         sentiment_m2 DOUBLE PRECISION,
 
-        PRIMARY KEY (hash),
-        UNIQUE (hash), 
-        FOREIGN KEY (hash) REFERENCES articles(hash)
+        PRIMARY KEY (hash, published)
+        --FOREIGN KEY (hash) REFERENCES articles(hash)
     );
 
 
@@ -51,7 +50,7 @@ CREATE INDEX idx_sentiments_origin_published ON sentiments (origin, published DE
 
 ALTER TABLE articles SET (
         timescaledb.compress,
-        timescaledb.compress_segmentby = 'origin',
+        timescaledb.compress_segmentby = 'origin, hash',
         timescaledb.compress_orderby = 'published DESC'
     );
 
@@ -60,7 +59,7 @@ SELECT add_compression_policy('articles',
 
 ALTER TABLE sentiments SET (
         timescaledb.compress,
-        timescaledb.compress_segmentby = 'origin',
+        timescaledb.compress_segmentby = 'origin, hash',
         timescaledb.compress_orderby = 'published DESC'
     );
 

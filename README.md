@@ -23,6 +23,8 @@ python3 -m venv venv
 pip3 install -r requirements.txt
 # install the driver needed by selenium.
 sudo apt install chromium-chromedriver
+# and maybe:
+sudo apt install chromium-browser
 ```
 ### Database
 ```bash
