@@ -1,6 +1,6 @@
 services:
   news-scraper:
-    build: 
+    build:
       context: ./src
       dockerfile: Dockerfile
     environment:
